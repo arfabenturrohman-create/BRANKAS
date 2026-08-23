@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BRANKAS PINTAR — SMKN 1 NGLEGOK</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- SIDEBAR NAVIGATION -->
+        <aside class="sidebar">
+            <div class="sidebar-top-logos">
+                <img src="img/logosmk.png" alt="SMKN 1 Nglegok" class="school-logo" onerror="this.src='https://via.placeholder.com/45/070a12/38bdf8?text=SMK'">
+                <div class="logo-divider"></div>
+                <img src="img/logoteismk.png" alt="Teknik Elektronika Industri" class="school-logo" onerror="this.src='https://via.placeholder.com/45/070a12/38bdf8?text=TEI'">
+            </div>
+
+            <div class="sidebar-brand">
+                <div class="brand-icon-wrapper">
+                    <i data-lucide="shield-check"></i>
+                </div>
+                <div class="brand-text">
+                    <h2>BRANKAS PINTAR</h2>
+                    <p>SMKN 1 NGLEGOK — TEI</p>
+                </div>
+            </div>
+
+            <div class="menu-label">MAIN NAVIGATION</div>
+            <nav class="nav-menu">
+                <button class="nav-item active" data-tab="dashboard">
+                    <i data-lucide="layout-dashboard"></i>
+                    <span>Dashboard</span>
+                </button>
+                <button class="nav-item" data-tab="sensor">
+                    <i data-lucide="cpu"></i>
+                    <span>Data Sensor</span>
+                </button>
+                <button class="nav-item" data-tab="keamanan">
+                    <i data-lucide="camera"></i>
+                    <span>Keamanan & Foto</span>
+                </button>
+                <button class="nav-item" data-tab="output">
+                    <i data-lucide="zap"></i>
+                    <span>Output & Aktuator</span>
+                </button>
+                <button class="nav-item" data-tab="about">
+                    <i data-lucide="users"></i>
+                    <span>About Project</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="status-indicator">
+                    <span class="dot online pulse"></span>
+                    <span>I2C Bus & Gateway: Active</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            <!-- HEADER -->
+            <header class="top-header">
+                <div class="header-title">
+                    <h1>Real-time Security Dashboard</h1>
+                    <p>BRANKAS PINTAR</p>
+                </div>
+                <div class="header-right">
+                    <div class="clock-card">
+                        <i data-lucide="clock"></i>
+                        <span id="live-clock">--:--:-- WIB</span>
+                    </div>
+                    <div class="header-profile">
+                        <div class="avatar"><i data-lucide="shield"></i></div>
+                        <div class="user-info">
+                            <span class="user-name">TEI Control Hub</span>
+                            <span class="user-role">Read-Only Mode</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- TAB 1: OVERVIEW DASHBOARD -->
+            <section id="tab-dashboard" class="tab-content active">
+                <div class="hero-banner">
+                    <div class="hero-text">
+                        <h2>Status Sistem Keamanan: <span class="badge-status-safe" id="hero-status">TERPROTEKSI AMAN</span></h2>
+                        <p>Komunikasi I2C antara ATmega328 (Master) dan ESP32 (Gateway) beroperasi normal.</p>
+                    </div>
+                    <div class="hero-badge">
+                        <i data-lucide="wifi"></i> WiFi / MQTT Sync
+                    </div>
+                </div>
+
+                <div class="cards-grid">
+                    <div class="card">
+                        <div class="card-icon red"><i data-lucide="lock"></i></div>
+                        <div class="card-info">
+                            <h3>Status Solenoid Door</h3>
+                            <p class="status-value" id="dash-lock-status">TERKUNCI</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon cyan"><i data-lucide="door-closed"></i></div>
+                        <div class="card-info">
+                            <h3>Sensor Pintu (Magnetic)</h3>
+                            <p class="status-value" id="dash-door-status">TERTUTUP</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon cyan"><i data-lucide="activity"></i></div>
+                        <div class="card-info">
+                            <h3>Deteksi MPU6050</h3>
+                            <p class="status-value" id="dash-mpu-status">STABIL</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon orange"><i data-lucide="keypad"></i></div>
+                        <div class="card-info">
+                            <h3>Percobaan PIN 4x4</h3>
+                            <p class="status-value"><span id="dash-pin-failed">0</span> / 3 Gagal</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-grid">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h2><i data-lucide="list"></i> Live Log Kejadian Real-Time</h2>
+                        </div>
+                        <div class="panel-body">
+                            <ul class="log-list" id="live-feed-list">
+                                <li>
+                                    <span class="badge info">System</span>
+                                    <span class="log-text">Sistem siap. Jalur I2C ATmega328 & ESP32 aktif.</span>
+                                    <span class="log-time">Now</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h2><i data-lucide="hard-drive"></i> Status Hardware & Jalur Komunikasi</h2>
+                        </div>
+                        <div class="panel-body device-status-grid">
+                            <div class="device-item">
+                                <div class="device-info">
+                                    <i data-lucide="cpu"></i>
+                                    <div>
+                                        <h4>ATmega328 (Master)</h4>
+                                        <p>Keypad 4x4, Solenoid, Buzzer, LED</p>
+                                    </div>
+                                </div>
+                                <span class="dot online pulse"></span>
+                            </div>
+                            <div class="device-item">
+                                <div class="device-info">
+                                    <i data-lucide="network"></i>
+                                    <div>
+                                        <h4>Komunikasi I2C</h4>
+                                        <p>Jalur Transmisi Data Master-Slave</p>
+                                    </div>
+                                </div>
+                                <span class="dot online pulse"></span>
+                            </div>
+                            <div class="device-item">
+                                <div class="device-info">
+                                    <i data-lucide="wifi"></i>
+                                    <div>
+                                        <h4>ESP32 + ESP32-CAM</h4>
+                                        <p>IoT Gateway & Foto Akses Ilegal</p>
+                                    </div>
+                                </div>
+                                <span class="dot online pulse"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: DATA SENSOR -->
+            <section id="tab-sensor" class="tab-content">
+                <div class="sensor-groups-grid">
+                    <!-- GROUP 1: KEYPAD & SENSOR PINTU -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h2><i data-lucide="key-round"></i> Input Akses & Sensor Pintu</h2>
+                        </div>
+                        <div class="panel-body sensor-card-body">
+                            <div class="sensor-metric">
+                                <span class="label">Status Solenoid / Relay Kunci</span>
+                                <span class="val highlight-red" id="solenoid-status">TERKUNCI</span>
+                            </div>
+                            <div class="sensor-metric">
+                                <span class="label">Sensor Pintu (Magnetic Switch)</span>
+                                <span class="val highlight-cyan" id="door-switch-status">TERTUTUP</span>
+                            </div>
+                            <div class="sensor-metric">
+                                <span class="label">Percobaan PIN Gagal (Keypad 4x4)</span>
+                                <span class="val counter" id="pin-failed-count">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- GROUP 2: MPU6050 -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h2><i data-lucide="navigation"></i> Sensor Gerak & Posisi (MPU6050)</h2>
+                        </div>
+                        <div class="panel-body">
+                            <div class="sensor-metric">
+                                <span class="label">Status Perpindahan & Guncangan</span>
+                                <span class="val highlight-green" id="mpu-state">STABIL / AMAN</span>
+                            </div>
+                            <div class="gauge-group">
+                                <div class="gauge-item">
+                                    <div class="gauge-label"><span>Accel X-Axis</span> <b id="acc-x-val">0.00</b></div>
+                                    <div class="progress-bar"><div class="fill" id="bar-x" style="width: 50%;"></div></div>
+                                </div>
+                                <div class="gauge-item">
+                                    <div class="gauge-label"><span>Accel Y-Axis</span> <b id="acc-y-val">0.00</b></div>
+                                    <div class="progress-bar"><div class="fill" id="bar-y" style="width: 50%;"></div></div>
+                                </div>
+                                <div class="gauge-item">
+                                    <div class="gauge-label"><span>Accel Z-Axis</span> <b id="acc-z-val">1.00</b></div>
+                                    <div class="progress-bar"><div class="fill" id="bar-z" style="width: 80%;"></div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- GROUP 3: ESP32-CAM -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h2><i data-lucide="camera"></i> Kamera Keamanan (ESP32-CAM)</h2>
+                        </div>
+                        <div class="panel-body sensor-card-body">
+                            <div class="sensor-metric">
+                                <span class="label">Status Ketersediaan Kamera</span>
+                                <span class="val highlight-cyan" id="cam-ready-state">READY</span>
+                            </div>
+                            <div class="sensor-metric">
+                                <span class="label">Tangkapan Akses Ilegal Terakhir</span>
+                                <span class="val-sub" id="cam-last-time">Belum Ada Tangkapan</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- GROUP 4: AKTUATOR & ALARM -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h2><i data-lucide="volume-2"></i> Status Aktuator & Indikator</h2>
+                        </div>
+                        <div class="panel-body sensor-card-body">
+                            <div class="sensor-metric">
+                                <span class="label">Buzzer (Alarm Audio)</span>
+                                <span class="val" id="buzzer-state">SILENT</span>
+                            </div>
+                            <div class="sensor-metric">
+                                <span class="label">LED Indikator Status</span>
+                                <span class="val highlight-green" id="led-indicator-state">HIJAU (STANDBY)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: KEAMANAN & FOTO -->
+            <section id="tab-keamanan" class="tab-content">
+                <div class="panel">
+                    <div class="panel-header">
+                        <h2><i data-lucide="image"></i> Tangkapan Foto Penyusup (ESP32-CAM)</h2>
+                    </div>
+                    <div class="panel-body">
+                        <div class="cam-gallery">
+                            <div class="cam-card">
+                                <div class="img-wrapper">
+                                    <img src="https://via.placeholder.com/400x250/1e293b/38bdf8?text=ESP32-CAM+Capture" alt="Capture Penyusup" class="gallery-img" id="latest-cam-img">
+                                </div>
+                                <div class="cam-info">
+                                    <span>Pemicu: PIN Salah 3x / Perpindahan</span>
+                                    <small id="img-time-1">--:-- WIB</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: OUTPUT -->
+            <section id="tab-output" class="tab-content">
+                <div class="cards-grid">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h2><i data-lucide="lock"></i> Solenoid Door Lock</h2>
+                        </div>
+                        <div class="panel-body actuator-card">
+                            <div class="actuator-icon red" id="actuator-solenoid-icon">
+                                <i data-lucide="lock"></i>
+                            </div>
+                            <h3 id="actuator-solenoid-text">Solenoid Terkunci</h3>
+                            <p>Relay kunci aktif menahan pintu brankas.</p>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h2><i data-lucide="bell"></i> Buzzer (Alarm Audio)</h2>
+                        </div>
+                        <div class="panel-body actuator-card">
+                            <div class="actuator-icon green" id="actuator-buzzer-icon">
+                                <i data-lucide="bell-off"></i>
+                            </div>
+                            <h3 id="actuator-buzzer-text">Buzzer Non-Aktif</h3>
+                            <p>Sistem dalam kondisi aman / standby.</p>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h2><i data-lucide="lightbulb"></i> LED Indikator Status</h2>
+                        </div>
+                        <div class="panel-body actuator-card">
+                            <div class="actuator-icon green" id="actuator-led-icon">
+                                <i data-lucide="check-circle"></i>
+                            </div>
+                            <h3 id="actuator-led-text">LED Hijau (Standby)</h3>
+                            <p>Menandakan status sistem normal.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 5: ABOUT PROJECT -->
+            <section id="tab-about" class="tab-content">
+                <div class="about-grid">
+                    <div class="about-photo-card">
+                        <img src="img/kelompok.jpg" alt="Foto Anggota Kelompok" onerror="this.src='https://via.placeholder.com/600x800/1e293b/38bdf8?text=Foto+Kelompok+TEI'">
+                        <div class="photo-overlay-tag">
+                            <i data-lucide="award"></i> SMKN 1 NGLEGOK — TEI
+                        </div>
+                    </div>
+                    <div class="about-details">
+                        <div class="panel">
+                            <h2>Sistem Monitoring Keamanan Brankas Pintar Berbasis IoT</h2>
+                            <p class="about-desc"> Sistem Monitoring Keamanan Brankas Pintar Berbasis IoT Menggunakan ATmega328 dan ESP32 dengan Komunikasi Data I2C serta User Interface Web Online dengan Fitur Deteksi Akses Ilegal dan Perpindahan Posisi Menggunakan ESP32-CAM dan MPU6050</p>
+                            
+                            <h3>Anggota Kelompok:</h3>
+                            <div class="team-list">
+                                <div class="team-card">
+                                    <span class="num">01</span>
+                                    <div class="member-info">
+                                        <h4>Arfa Bentur Rohman</h4>
+                                        <p>No: 12</p>
+                                    </div>
+                                </div>
+                                <div class="team-card">
+                                    <span class="num">02</span>
+                                    <div class="member-info">
+                                        <h4>Chika Anggraini</h4>
+                                        <p>No: 20</p>
+                                    </div>
+                                </div>
+                                <div class="team-card">
+                                    <span class="num">03</span>
+                                    <div class="member-info">
+                                        <h4>Dika Yoga Pratama</h4>
+                                        <p>No: 26</p>
+                                    </div>
+                                </div>
+                                <div class="team-card">
+                                    <span class="num">04</span>
+                                    <div class="member-info">
+                                        <h4>Faida Trisma Amelia</h4>
+                                        <p>No: 30</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- MODAL FOTO GALERI -->
+    <div class="modal" id="image-modal">
+        <span class="close-modal">&times;</span>
+        <img class="modal-content-img" id="modal-img">
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
