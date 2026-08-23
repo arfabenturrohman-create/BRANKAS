@@ -40,7 +40,7 @@ body {
     min-height: 100vh;
 }
 
-/* SIDEBAR */
+/* SIDEBAR & LOGOS FIXED */
 .sidebar {
     width: 280px;
     background: var(--sidebar-bg);
@@ -64,15 +64,25 @@ body {
 }
 
 .school-logo {
-    width: 42px;
-    height: 42px;
+    width: 48px;
+    height: 48px;
     object-fit: contain;
-    filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.3));
-    transition: transform 0.3s ease;
+    background: transparent !important; /* Paksa background bening */
+    mix-blend-mode: screen; /* Mengeliminasi background hitam sisa jika ada */
+    filter: drop-shadow(0 2px 8px rgba(56, 189, 248, 0.3));
+    transition: transform 0.3s ease, filter 0.3s ease;
 }
 
-.school-logo:hover { transform: scale(1.1); }
-.logo-divider { width: 1px; height: 30px; background: var(--border-color); }
+.school-logo:hover {
+    transform: scale(1.08);
+    filter: drop-shadow(0 4px 12px rgba(56, 189, 248, 0.6));
+}
+
+.logo-divider { 
+    width: 1px; 
+    height: 32px; 
+    background: var(--border-color); 
+}
 
 .sidebar-brand {
     display: flex;
@@ -150,8 +160,8 @@ body {
 /* MAIN CONTENT AREA */
 .main-content { flex: 1; padding: 32px; overflow-y: auto; }
 .top-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
-.header-title h1 { font-size: 1.6rem; font-weight: 800; }
-.header-title p { font-size: 0.85rem; color: var(--text-sub); margin-top: 4px; }
+.header-title h1 { font-size: 1.6rem; font-weight: 800; transition: all 0.2s ease; }
+.header-title p { font-size: 0.85rem; color: var(--text-sub); margin-top: 4px; transition: all 0.2s ease; }
 .header-right { display: flex; align-items: center; gap: 16px; }
 
 .clock-card {
@@ -192,7 +202,7 @@ body {
 .user-name { display: block; font-size: 0.82rem; font-weight: 700; }
 .user-role { display: block; font-size: 0.68rem; color: var(--text-sub); }
 
-/* TAB SYSTEM ANIMATION */
+/* TAB SYSTEM */
 .tab-content {
     display: none;
     opacity: 0;

@@ -14,9 +14,9 @@
         <!-- SIDEBAR NAVIGATION -->
         <aside class="sidebar">
             <div class="sidebar-top-logos">
-                <img src="img/logosmk.png" alt="SMKN 1 Nglegok" class="school-logo" onerror="this.src='https://via.placeholder.com/45/070a12/38bdf8?text=SMK'">
+                <img src="img/logosmk.png" alt="SMKN 1 Nglegok" class="school-logo">
                 <div class="logo-divider"></div>
-                <img src="img/logoteismk.png" alt="Teknik Elektronika Industri" class="school-logo" onerror="this.src='https://via.placeholder.com/45/070a12/38bdf8?text=TEI'">
+                <img src="img/logoteismk.png" alt="Teknik Elektronika Industri" class="school-logo">
             </div>
 
             <div class="sidebar-brand">
@@ -25,7 +25,7 @@
                 </div>
                 <div class="brand-text">
                     <h2>BRANKAS PINTAR</h2>
-                    <p>SMKN 1 NGLEGOK — TEI</p>
+                    <p>KELOMPOK 3</p>
                 </div>
             </div>
 
@@ -63,11 +63,11 @@
 
         <!-- MAIN CONTENT -->
         <main class="main-content">
-            <!-- HEADER -->
+            <!-- DYNAMIC HEADER -->
             <header class="top-header">
                 <div class="header-title">
-                    <h1>Real-time Security Dashboard</h1>
-                    <p>BRANKAS PINTAR</p>
+                    <h1 id="page-title">Real-time Security Dashboard</h1>
+                    <p id="page-desc">BRANKAS PINTAR — Ringkasan Utama Keamanan & Sistem IoT</p>
                 </div>
                 <div class="header-right">
                     <div class="clock-card">
@@ -185,7 +185,6 @@
             <!-- TAB 2: DATA SENSOR -->
             <section id="tab-sensor" class="tab-content">
                 <div class="sensor-groups-grid">
-                    <!-- GROUP 1: KEYPAD & SENSOR PINTU -->
                     <div class="panel">
                         <div class="panel-header">
                             <h2><i data-lucide="key-round"></i> Input Akses & Sensor Pintu</h2>
@@ -206,7 +205,6 @@
                         </div>
                     </div>
 
-                    <!-- GROUP 2: MPU6050 -->
                     <div class="panel">
                         <div class="panel-header">
                             <h2><i data-lucide="navigation"></i> Sensor Gerak & Posisi (MPU6050)</h2>
@@ -219,21 +217,20 @@
                             <div class="gauge-group">
                                 <div class="gauge-item">
                                     <div class="gauge-label"><span>Accel X-Axis</span> <b id="acc-x-val">0.00</b></div>
-                                    <div class="progress-bar"><div class="fill" id="bar-x" style="width: 50%;"></div></div>
+                                    <div class="progress-bar"><div class="fill" id="bar-x" style="width: 0%;"></div></div>
                                 </div>
                                 <div class="gauge-item">
                                     <div class="gauge-label"><span>Accel Y-Axis</span> <b id="acc-y-val">0.00</b></div>
-                                    <div class="progress-bar"><div class="fill" id="bar-y" style="width: 50%;"></div></div>
+                                    <div class="progress-bar"><div class="fill" id="bar-y" style="width: 0%;"></div></div>
                                 </div>
                                 <div class="gauge-item">
                                     <div class="gauge-label"><span>Accel Z-Axis</span> <b id="acc-z-val">1.00</b></div>
-                                    <div class="progress-bar"><div class="fill" id="bar-z" style="width: 80%;"></div></div>
+                                    <div class="progress-bar"><div class="fill" id="bar-z" style="width: 50%;"></div></div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- GROUP 3: ESP32-CAM -->
                     <div class="panel">
                         <div class="panel-header">
                             <h2><i data-lucide="camera"></i> Kamera Keamanan (ESP32-CAM)</h2>
@@ -250,7 +247,6 @@
                         </div>
                     </div>
 
-                    <!-- GROUP 4: AKTUATOR & ALARM -->
                     <div class="panel">
                         <div class="panel-header">
                             <h2><i data-lucide="volume-2"></i> Status Aktuator & Indikator</h2>
@@ -345,7 +341,7 @@
                     <div class="about-details">
                         <div class="panel">
                             <h2>Sistem Monitoring Keamanan Brankas Pintar Berbasis IoT</h2>
-                            <p class="about-desc"> Sistem Monitoring Keamanan Brankas Pintar Berbasis IoT Menggunakan ATmega328 dan ESP32 dengan Komunikasi Data I2C serta User Interface Web Online dengan Fitur Deteksi Akses Ilegal dan Perpindahan Posisi Menggunakan ESP32-CAM dan MPU6050</p>
+                            <p class="about-desc">Menggunakan ATmega328 dan ESP32 dengan Komunikasi Data I2C serta Fitur Deteksi Akses Ilegal dan Perpindahan Posisi Menggunakan ESP32-CAM dan MPU6050.</p>
                             
                             <h3>Anggota Kelompok:</h3>
                             <div class="team-list">
@@ -353,28 +349,28 @@
                                     <span class="num">01</span>
                                     <div class="member-info">
                                         <h4>Arfa Bentur Rohman</h4>
-                                        <p>No: 12</p>
+                                        <p>No. Presensi: 12</p>
                                     </div>
                                 </div>
                                 <div class="team-card">
                                     <span class="num">02</span>
                                     <div class="member-info">
                                         <h4>Chika Anggraini</h4>
-                                        <p>No: 20</p>
+                                        <p>No. Presensi: 20</p>
                                     </div>
                                 </div>
                                 <div class="team-card">
                                     <span class="num">03</span>
                                     <div class="member-info">
                                         <h4>Dika Yoga Pratama</h4>
-                                        <p>No: 26</p>
+                                        <p>No. Presensi: 26</p>
                                     </div>
                                 </div>
                                 <div class="team-card">
                                     <span class="num">04</span>
                                     <div class="member-info">
                                         <h4>Faida Trisma Amelia</h4>
-                                        <p>No: 30</p>
+                                        <p>No. Presensi: 30</p>
                                     </div>
                                 </div>
                             </div>

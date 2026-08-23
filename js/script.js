@@ -1,18 +1,51 @@
 document.addEventListener('DOMContentLoaded', () => {
     lucide.createIcons();
 
-    // TAB NAVIGATION SYSTEM
+    // MAP JUDUL DAN DESKRIPSI DINAMIS SETIAP HALAMAN
+    const pageHeaders = {
+        'dashboard': {
+            title: 'Real-time Security Dashboard',
+            desc: 'BRANKAS PINTAR — Ringkasan Utama Keamanan & Sistem IoT'
+        },
+        'sensor': {
+            title: 'Monitoring Telemetri Sensor',
+            desc: 'Data Real-time Keypad 4x4, MPU6050, Sensor Pintu, & Kamera'
+        },
+        'keamanan': {
+            title: 'Galeri Tangkapan Akses Ilegal',
+            desc: 'Dokumentasi Foto Penyusup & Log Deteksi Pemicu Keamanan'
+        },
+        'output': {
+            title: 'Status Aktuator & Indikator Output',
+            desc: 'Monitoring Solenoid Lock, Alarm Audio Buzzer, & LED Status'
+        },
+        'about': {
+            title: 'Informasi Project & Profil Tim',
+            desc: 'Teknik Elektronika Industri — SMKN 1 NGLEGOK'
+        }
+    };
+
+    // TAB NAVIGATION SYSTEM WITH DYNAMIC HEADER
     const navItems = document.querySelectorAll('.nav-item');
     const tabContents = document.querySelectorAll('.tab-content');
+    const pageTitleElem = document.getElementById('page-title');
+    const pageDescElem = document.getElementById('page-desc');
 
     navItems.forEach(item => {
         item.addEventListener('click', () => {
             const tabId = item.getAttribute('data-tab');
+
             navItems.forEach(nav => nav.classList.remove('active'));
             tabContents.forEach(tab => tab.classList.remove('active'));
+            
             item.classList.add('active');
             const targetTab = document.getElementById(`tab-${tabId}`);
             if (targetTab) targetTab.classList.add('active');
+
+            if (pageHeaders[tabId]) {
+                if (pageTitleElem) pageTitleElem.textContent = pageHeaders[tabId].title;
+                if (pageDescElem) pageDescElem.textContent = pageHeaders[tabId].desc;
+            }
         });
     });
 
@@ -28,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(updateClock, 1000);
     updateClock();
 
-    // COUNTER ANIMATION FOR PIN FAILED COUNT
+    // COUNTER ANIMATION
     function animateCounter(element, start, end, duration) {
         if (!element) return;
         let startTimestamp = null;
@@ -41,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.requestAnimationFrame(step);
     }
 
-    // IMAGE MODAL SYSTEM
+    // IMAGE MODAL
     const modal = document.getElementById('image-modal');
     const modalImg = document.getElementById('modal-img');
     const closeModal = document.querySelector('.close-modal');
@@ -61,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // LIVE LOG FEED GENERATOR
+    // LIVE LOG FEED
     function addLogEntry(type, message) {
         const feedList = document.getElementById('live-feed-list');
         if (!feedList) return;
@@ -82,13 +115,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         feedList.insertBefore(li, feedList.firstChild);
 
-        // Limit list to 10 items
         if (feedList.children.length > 10) {
             feedList.removeChild(feedList.lastChild);
         }
     }
 
-    // AUTO-FETCH DATA SENSOR
+    // AUTO-FETCH SENSOR DATA
     let previousPinFailed = -1;
     let previousMotionState = false;
     let previousDoorState = false;
@@ -96,10 +128,10 @@ document.addEventListener('DOMContentLoaded', () => {
     async function fetchSensorData() {
         try {
             const response = await fetch('data_sensor.json');
-            if (!response.ok) throw new Error('Network response error');
+            if (!response.ok) throw new Error('Network error');
             const data = await response.json();
 
-            // Status Hero Banner
+            // Status Hero
             const heroStatus = document.getElementById('hero-status');
             const isAlert = data.pin_failed >= 3 || data.motion_detected;
             if (heroStatus) {
@@ -107,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 heroStatus.className = isAlert ? 'badge-status-danger' : 'badge-status-safe';
             }
 
-            // Status Solenoid
+            // Solenoid
             const lockStatusElem = document.getElementById('dash-lock-status');
             const solenoidStatusElem = document.getElementById('solenoid-status');
             const actuatorSolenoidText = document.getElementById('actuator-solenoid-text');
@@ -122,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 actuatorSolenoidText.textContent = data.solenoid_open ? 'Solenoid Terbuka (Akses Diterima)' : 'Solenoid Terkunci';
             }
 
-            // Status Sensor Pintu (Magnetic Switch)
+            // Sensor Pintu
             const dashDoor = document.getElementById('dash-door-status');
             const doorSwitch = document.getElementById('door-switch-status');
             const doorText = data.door_open ? 'TERBUKA' : 'TERTUTUP';
@@ -138,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             previousDoorState = data.door_open;
 
-            // Counter PIN Gagal
+            // PIN Failed Counter
             if (data.pin_failed !== previousPinFailed) {
                 const dashPin = document.getElementById('dash-pin-failed');
                 const pinFailedElem = document.getElementById('pin-failed-count');
@@ -152,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 previousPinFailed = data.pin_failed;
             }
 
-            // MPU6050 Accelerometer
+            // MPU6050
             const accXVal = document.getElementById('acc-x-val');
             const accYVal = document.getElementById('acc-y-val');
             const accZVal = document.getElementById('acc-z-val');
@@ -167,7 +199,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (barY) barY.style.width = `${Math.min(Math.abs(data.accel_y) * 50, 100)}%`;
             if (barZ) barZ.style.width = `${Math.min(Math.abs(data.accel_z) * 50, 100)}%`;
 
-            // MPU State
             const dashMpu = document.getElementById('dash-mpu-status');
             const mpuState = document.getElementById('mpu-state');
             const mpuText = data.motion_detected ? 'PERPINDAHAN TERDETEKSI' : 'STABIL / AMAN';
@@ -182,7 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             previousMotionState = data.motion_detected;
 
-            // Kamera Status & Foto
+            // ESP32-CAM
             const camReadyState = document.getElementById('cam-ready-state');
             const camLastTime = document.getElementById('cam-last-time');
             const imgTime1 = document.getElementById('img-time-1');
@@ -191,12 +222,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (camReadyState) camReadyState.textContent = data.cam_status || 'READY';
             if (camLastTime) camLastTime.textContent = data.last_capture_time || 'Belum Ada Tangkapan';
             if (imgTime1) imgTime1.textContent = data.last_capture_time || '--:-- WIB';
-            
-            if (latestCamImg && data.image_url) {
-                latestCamImg.src = data.image_url;
-            }
+            if (latestCamImg && data.image_url) latestCamImg.src = data.image_url;
 
-            // Buzzer & LED Indikator
+            // Buzzer & LED
             const buzzerState = document.getElementById('buzzer-state');
             const ledState = document.getElementById('led-indicator-state');
             const actuatorBuzzerText = document.getElementById('actuator-buzzer-text');
@@ -214,7 +242,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
         } catch (error) {
-            console.log('Menunggu sinkronisasi data_sensor.json...');
+            console.log('Menunggu file data_sensor.json...');
         }
     }
 
