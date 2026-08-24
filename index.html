@@ -1,398 +1,498 @@
-                            
-                            
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BRANKAS PINTAR — SMKN 1 NGLEGOK</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <link rel="stylesheet" href="css/style.css">
+    <title>Website Portofolio Interaktif</title>
+    <style>
+        /* ==========================================
+           1. RESET & VARIABLES
+           ========================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --accent: #38bdf8;
+            --accent-hover: #0284c7;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --header-bg: rgba(15, 23, 42, 0.85);
+            --transition-speed: 0.4s;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ==========================================
+           2. HEADER & NAVIGATION (DYNAMIC STYLES)
+           ========================================== */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px 8%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--header-bg);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            transition: all var(--transition-speed) ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Gaya Header khusus saat berada di Seksi About */
+        header.theme-about {
+            background: rgba(30, 41, 59, 0.95);
+            border-bottom: 2px solid var(--accent);
+            box-shadow: 0 10px 30px rgba(56, 189, 248, 0.15);
+        }
+
+        /* Gaya Header khusus saat berada di Seksi Projects */
+        header.theme-projects {
+            background: rgba(15, 23, 42, 0.95);
+            border-bottom: 2px solid #a855f7;
+            box-shadow: 0 10px 30px rgba(168, 85, 247, 0.15);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: color var(--transition-speed);
+        }
+
+        header.theme-projects .logo {
+            color: #a855f7;
+        }
+
+        .logo-tag {
+            font-size: 0.8rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 8px;
+            border-radius: 12px;
+            color: var(--text-muted);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        nav a {
+            color: var(--text-main);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            width: 0%;
+            height: 2px;
+            bottom: -5px;
+            left: 0;
+            background-color: var(--accent);
+            transition: width 0.3s ease;
+        }
+
+        header.theme-projects nav a::after {
+            background-color: #a855f7;
+        }
+
+        nav a:hover::after,
+        nav a.active::after {
+            width: 100%;
+        }
+
+        /* ==========================================
+           3. SECTIONS & LAYOUT
+           ========================================== */
+        section {
+            min-height: 100vh;
+            padding: 120px 8% 80px 8%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+            text-align: center;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 60px;
+            height: 4px;
+            background: var(--accent);
+            margin: 10px auto 0 auto;
+            border-radius: 2px;
+        }
+
+        /* Hero Section */
+        #home {
+            align-items: center;
+            text-align: center;
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #38bdf8, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* About Section */
+        #about {
+            background-color: var(--bg-secondary);
+        }
+
+        .about-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+        }
+
+        .about-text p {
+            margin-bottom: 20px;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        /* Gallery / Projects Section */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .gallery-item {
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            background: var(--bg-secondary);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(56, 189, 248, 0.2);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.5s ease;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .gallery-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.7);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .gallery-item:hover .gallery-overlay {
+            opacity: 1;
+        }
+
+        .gallery-overlay span {
+            color: #fff;
+            font-weight: 600;
+            font-size: 1.1rem;
+            border: 2px solid var(--accent);
+            padding: 8px 16px;
+            border-radius: 20px;
+        }
+
+        /* ==========================================
+           4. ZOOM LIGHTBOX MODAL (ANIMATED)
+           ========================================== */
+        .lightbox-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+            backdrop-filter: blur(8px);
+        }
+
+        .lightbox-modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Animasi Zoom-In saat muncul & Zoom-Out saat ditutup */
+        .lightbox-content {
+            max-width: 85%;
+            max-height: 85%;
+            border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            transform: scale(0.5); /* Mulai dari kecil */
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .lightbox-modal.active .lightbox-content {
+            transform: scale(1); /* Zoom ke ukuran normal */
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: 30px;
+            right: 40px;
+            color: #fff;
+            font-size: 2.5rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .lightbox-close:hover {
+            color: var(--accent);
+        }
+
+        /* ==========================================
+           5. ANIMATIONS & SCROLL REVEAL
+           ========================================== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Floating Animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .floating-element {
+            animation: float 4s ease-in-out infinite;
+        }
+    </style>
 </head>
 <body>
 
-    <div class="app-container">
-        <!-- SIDEBAR NAVIGATION -->
-        <aside class="sidebar">
-            <div class="sidebar-top-logos">
-                <img src="img/logosmk.png" alt="SMKN 1 Nglegok" class="school-logo" onerror="this.src='https://via.placeholder.com/45/070a12/38bdf8?text=SMK'">
-                <div class="logo-divider"></div>
-                <img src="img/logoteismk.png" alt="Teknik Elektronika Industri" class="school-logo" onerror="this.src='https://via.placeholder.com/45/070a12/38bdf8?text=TEI'">
-            </div>
+    <!-- HEADER / NAVIGATION -->
+    <header id="main-header">
+        <a href="#home" class="logo">
+            PORTOFOLIO
+            <span class="logo-tag" id="header-status">Home</span>
+        </a>
+        <nav>
+            <ul>
+                <li><a href="#home" class="nav-link active">Home</a></li>
+                <li><a href="#about" class="nav-link">About</a></li>
+                <li><a href="#projects" class="nav-link">Projects</a></li>
+            </ul>
+        </nav>
+    </header>
 
-            <div class="sidebar-brand">
-                <div class="brand-icon-wrapper">
-                    <i data-lucide="shield-check"></i>
+    <!-- MAIN CONTENT -->
+    <main>
+        <!-- HOME SECTION -->
+        <section id="home">
+            <h1 class="hero-title floating-element">Selamat Datang</h1>
+            <p class="reveal" style="font-size: 1.2rem; color: var(--text-muted); max-width: 600px;">
+                Website portofolio interaktif dengan header dinamis, galeri foto dengan efek zoom-out, serta animasi modern.
+            </p>
+        </section>
+
+        <!-- ABOUT SECTION -->
+        <section id="about">
+            <h2 class="section-title reveal">Tentang Saya</h2>
+            <div class="about-container">
+                <div class="about-text reveal">
+                    <p>
+                        Header di atas secara otomatis mendeteksi ketika Anda memasuki halaman/seksi <strong>About</strong> ini! Warna border dan status tag di header akan berubah secara halus.
+                    </p>
+                    <p>
+                        Setiap elemen di halaman ini dirancang menggunakan animasi berbasis scroll yang memberikan kesan elegan dan profesional.
+                    </p>
                 </div>
-                <div class="brand-text">
-                    <h2>BRANKAS PINTAR</h2>
-                    <p>Kelompok 3 — TEI</p>
-                </div>
-            </div>
-
-            <div class="menu-label">MAIN NAVIGATION</div>
-            <nav class="nav-menu">
-                <button class="nav-item active" data-tab="dashboard">
-                    <i data-lucide="layout-dashboard"></i>
-                    <span>Dashboard</span>
-                </button>
-                <button class="nav-item" data-tab="sensor">
-                    <i data-lucide="cpu"></i>
-                    <span>Data Sensor</span>
-                </button>
-                <button class="nav-item" data-tab="keamanan">
-                    <i data-lucide="camera"></i>
-                    <span>Keamanan & Foto</span>
-                </button>
-                <button class="nav-item" data-tab="output">
-                    <i data-lucide="zap"></i>
-                    <span>Output & Aktuator</span>
-                </button>
-                <button class="nav-item" data-tab="about">
-                    <i data-lucide="users"></i>
-                    <span>About Project</span>
-                </button>
-            </nav>
-
-            <div class="sidebar-footer">
-                <div class="status-indicator">
-                    <span class="dot online pulse"></span>
-                    <span>I2C Bus & Gateway: Active</span>
+                <div class="gallery-item reveal">
+                    <img src="https://picsum.photos/id/1018/800/600" alt="About Photo">
+                    <div class="gallery-overlay">
+                        <span>Klik untuk Zoom</span>
+                    </div>
                 </div>
             </div>
-        </aside>
+        </section>
 
-        <!-- MAIN CONTENT -->
-        <main class="main-content">
-            <!-- HEADER -->
-            <header class="top-header">
-                <div class="header-title">
-                    <h1>Real-time Security Dashboard</h1>
-                    <p>BRANKAS PINTAR</p>
-                </div>
-                <div class="header-right">
-                    <div class="clock-card">
-                        <i data-lucide="clock"></i>
-                        <span id="live-clock">--:--:-- WIB</span>
-                    </div>
-                    <div class="header-profile">
-                        <div class="avatar"><i data-lucide="shield"></i></div>
-                        <div class="user-info">
-                            <span class="user-name">TEI Control Hub</span>
-                            <span class="user-role">Read-Only Mode</span>
-                        </div>
+        <!-- PROJECTS SECTION -->
+        <section id="projects">
+            <h2 class="section-title reveal">Galeri / Projects</h2>
+            <div class="gallery-grid">
+                <div class="gallery-item reveal">
+                    <img src="https://picsum.photos/id/1015/800/600" alt="Project 1">
+                    <div class="gallery-overlay">
+                        <span>Klik untuk Zoom</span>
                     </div>
                 </div>
-            </header>
-
-            <!-- TAB 1: OVERVIEW DASHBOARD -->
-            <section id="tab-dashboard" class="tab-content active">
-                <div class="hero-banner">
-                    <div class="hero-text">
-                        <h2>Status Sistem Keamanan: <span class="badge-status-safe" id="hero-status">TERPROTEKSI AMAN</span></h2>
-                        <p>Komunikasi I2C antara ATmega328 (Master) dan ESP32 (Gateway) beroperasi normal.</p>
-                    </div>
-                    <div class="hero-badge">
-                        <i data-lucide="wifi"></i> WiFi / MQTT Sync
+                <div class="gallery-item reveal">
+                    <img src="https://picsum.photos/id/1016/800/600" alt="Project 2">
+                    <div class="gallery-overlay">
+                        <span>Klik melebarkan</span>
                     </div>
                 </div>
-
-                <div class="cards-grid">
-                    <div class="card">
-                        <div class="card-icon red"><i data-lucide="lock"></i></div>
-                        <div class="card-info">
-                            <h3>Status Solenoid Door</h3>
-                            <p class="status-value" id="dash-lock-status">TERKUNCI</p>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-icon cyan"><i data-lucide="door-closed"></i></div>
-                        <div class="card-info">
-                            <h3>Sensor Pintu (Magnetic)</h3>
-                            <p class="status-value" id="dash-door-status">TERTUTUP</p>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-icon cyan"><i data-lucide="activity"></i></div>
-                        <div class="card-info">
-                            <h3>Deteksi MPU6050</h3>
-                            <p class="status-value" id="dash-mpu-status">STABIL</p>
-                        </div>
-                    </div>
-                    <div class="card">
-                        <div class="card-icon orange"><i data-lucide="keypad"></i></div>
-                        <div class="card-info">
-                            <h3>Percobaan PIN 4x4</h3>
-                            <p class="status-value"><span id="dash-pin-failed">0</span> / 3 Gagal</p>
-                        </div>
+                <div class="gallery-item reveal">
+                    <img src="https://picsum.photos/id/1025/800/600" alt="Project 3">
+                    <div class="gallery-overlay">
+                        <span>Klik untuk Zoom</span>
                     </div>
                 </div>
+            </div>
+        </section>
+    </main>
 
-                <div class="content-grid">
-                    <div class="panel">
-                        <div class="panel-header">
-                            <h2><i data-lucide="list"></i> Live Log Kejadian Real-Time</h2>
-                        </div>
-                        <div class="panel-body">
-                            <ul class="log-list" id="live-feed-list">
-                                <li>
-                                    <span class="badge info">System</span>
-                                    <span class="log-text">Sistem siap. Jalur I2C ATmega328 & ESP32 aktif.</span>
-                                    <span class="log-time">Now</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="panel">
-                        <div class="panel-header">
-                            <h2><i data-lucide="hard-drive"></i> Status Hardware & Jalur Komunikasi</h2>
-                        </div>
-                        <div class="panel-body device-status-grid">
-                            <div class="device-item">
-                                <div class="device-info">
-                                    <i data-lucide="cpu"></i>
-                                    <div>
-                                        <h4>ATmega328 (Master)</h4>
-                                        <p>Keypad 4x4, Solenoid, Buzzer, LED</p>
-                                    </div>
-                                </div>
-                                <span class="dot online pulse"></span>
-                            </div>
-                            <div class="device-item">
-                                <div class="device-info">
-                                    <i data-lucide="network"></i>
-                                    <div>
-                                        <h4>Komunikasi I2C</h4>
-                                        <p>Jalur Transmisi Data Master-Slave</p>
-                                    </div>
-                                </div>
-                                <span class="dot online pulse"></span>
-                            </div>
-                            <div class="device-item">
-                                <div class="device-info">
-                                    <i data-lucide="wifi"></i>
-                                    <div>
-                                        <h4>ESP32 + ESP32-CAM</h4>
-                                        <p>IoT Gateway & Foto Akses Ilegal</p>
-                                    </div>
-                                </div>
-                                <span class="dot online pulse"></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- TAB 2: DATA SENSOR -->
-            <section id="tab-sensor" class="tab-content">
-                <div class="sensor-groups-grid">
-                    <!-- GROUP 1: KEYPAD & SENSOR PINTU -->
-                    <div class="panel">
-                        <div class="panel-header">
-                            <h2><i data-lucide="key-round"></i> Input Akses & Sensor Pintu</h2>
-                        </div>
-                        <div class="panel-body sensor-card-body">
-                            <div class="sensor-metric">
-                                <span class="label">Status Solenoid / Relay Kunci</span>
-                                <span class="val highlight-red" id="solenoid-status">TERKUNCI</span>
-                            </div>
-                            <div class="sensor-metric">
-                                <span class="label">Sensor Pintu (Magnetic Switch)</span>
-                                <span class="val highlight-cyan" id="door-switch-status">TERTUTUP</span>
-                            </div>
-                            <div class="sensor-metric">
-                                <span class="label">Percobaan PIN Gagal (Keypad 4x4)</span>
-                                <span class="val counter" id="pin-failed-count">0</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- GROUP 2: MPU6050 -->
-                    <div class="panel">
-                        <div class="panel-header">
-                            <h2><i data-lucide="navigation"></i> Sensor Gerak & Posisi (MPU6050)</h2>
-                        </div>
-                        <div class="panel-body">
-                            <div class="sensor-metric">
-                                <span class="label">Status Perpindahan & Guncangan</span>
-                                <span class="val highlight-green" id="mpu-state">STABIL / AMAN</span>
-                            </div>
-                            <div class="gauge-group">
-                                <div class="gauge-item">
-                                    <div class="gauge-label"><span>Accel X-Axis</span> <b id="acc-x-val">0.00</b></div>
-                                    <div class="progress-bar"><div class="fill" id="bar-x" style="width: 50%;"></div></div>
-                                </div>
-                                <div class="gauge-item">
-                                    <div class="gauge-label"><span>Accel Y-Axis</span> <b id="acc-y-val">0.00</b></div>
-                                    <div class="progress-bar"><div class="fill" id="bar-y" style="width: 50%;"></div></div>
-                                </div>
-                                <div class="gauge-item">
-                                    <div class="gauge-label"><span>Accel Z-Axis</span> <b id="acc-z-val">1.00</b></div>
-                                    <div class="progress-bar"><div class="fill" id="bar-z" style="width: 80%;"></div></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- GROUP 3: ESP32-CAM -->
-                    <div class="panel">
-                        <div class="panel-header">
-                            <h2><i data-lucide="camera"></i> Kamera Keamanan (ESP32-CAM)</h2>
-                        </div>
-                        <div class="panel-body sensor-card-body">
-                            <div class="sensor-metric">
-                                <span class="label">Status Ketersediaan Kamera</span>
-                                <span class="val highlight-cyan" id="cam-ready-state">READY</span>
-                            </div>
-                            <div class="sensor-metric">
-                                <span class="label">Tangkapan Akses Ilegal Terakhir</span>
-                                <span class="val-sub" id="cam-last-time">Belum Ada Tangkapan</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- GROUP 4: AKTUATOR & ALARM -->
-                    <div class="panel">
-                        <div class="panel-header">
-                            <h2><i data-lucide="volume-2"></i> Status Aktuator & Indikator</h2>
-                        </div>
-                        <div class="panel-body sensor-card-body">
-                            <div class="sensor-metric">
-                                <span class="label">Buzzer (Alarm Audio)</span>
-                                <span class="val" id="buzzer-state">SILENT</span>
-                            </div>
-                            <div class="sensor-metric">
-                                <span class="label">LED Indikator Status</span>
-                                <span class="val highlight-green" id="led-indicator-state">HIJAU (STANDBY)</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- TAB 3: KEAMANAN & FOTO -->
-            <section id="tab-keamanan" class="tab-content">
-                <div class="panel">
-                    <div class="panel-header">
-                        <h2><i data-lucide="image"></i> Tangkapan Foto Penyusup (ESP32-CAM)</h2>
-                    </div>
-                    <div class="panel-body">
-                        <div class="cam-gallery">
-                            <div class="cam-card">
-                                <div class="img-wrapper">
-                                    <img src="https://via.placeholder.com/400x250/1e293b/38bdf8?text=ESP32-CAM+Capture" alt="Capture Penyusup" class="gallery-img" id="latest-cam-img">
-                                </div>
-                                <div class="cam-info">
-                                    <span>Pemicu: PIN Salah 3x / Perpindahan</span>
-                                    <small id="img-time-1">--:-- WIB</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- TAB 4: OUTPUT -->
-            <section id="tab-output" class="tab-content">
-                <div class="cards-grid">
-                    <div class="panel">
-                        <div class="panel-header">
-                            <h2><i data-lucide="lock"></i> Solenoid Door Lock</h2>
-                        </div>
-                        <div class="panel-body actuator-card">
-                            <div class="actuator-icon red" id="actuator-solenoid-icon">
-                                <i data-lucide="lock"></i>
-                            </div>
-                            <h3 id="actuator-solenoid-text">Solenoid Terkunci</h3>
-                            <p>Relay kunci aktif menahan pintu brankas.</p>
-                        </div>
-                    </div>
-                    <div class="panel">
-                        <div class="panel-header">
-                            <h2><i data-lucide="bell"></i> Buzzer (Alarm Audio)</h2>
-                        </div>
-                        <div class="panel-body actuator-card">
-                            <div class="actuator-icon green" id="actuator-buzzer-icon">
-                                <i data-lucide="bell-off"></i>
-                            </div>
-                            <h3 id="actuator-buzzer-text">Buzzer Non-Aktif</h3>
-                            <p>Sistem dalam kondisi aman / standby.</p>
-                        </div>
-                    </div>
-                    <div class="panel">
-                        <div class="panel-header">
-                            <h2><i data-lucide="lightbulb"></i> LED Indikator Status</h2>
-                        </div>
-                        <div class="panel-body actuator-card">
-                            <div class="actuator-icon green" id="actuator-led-icon">
-                                <i data-lucide="check-circle"></i>
-                            </div>
-                            <h3 id="actuator-led-text">LED Hijau (Standby)</h3>
-                            <p>Menandakan status sistem normal.</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- TAB 5: ABOUT PROJECT -->
-            <section id="tab-about" class="tab-content">
-                <div class="about-grid">
-                    <div class="about-photo-card">
-                        <img src="img/kelompok.jpg" alt="Foto Anggota Kelompok" onerror="this.src='https://via.placeholder.com/600x800/1e293b/38bdf8?text=Foto+Kelompok+TEI'">
-                        <div class="photo-overlay-tag">
-                            <i data-lucide="award"></i> SMKN 1 NGLEGOK — TEI
-                        </div>
-                    </div>
-                    <div class="about-details">
-                        <div class="panel">
-                            <h2>Sistem Monitoring Keamanan Brankas Pintar Berbasis IoT</h2>
-                            <p class="about-desc"> Sistem Monitoring Keamanan Brankas Pintar Berbasis IoT Menggunakan ATmega328 dan ESP32 dengan Komunikasi Data I2C serta User Interface Web Online dengan Fitur Deteksi Akses Ilegal dan Perpindahan Posisi Menggunakan ESP32-CAM dan MPU6050</p>
-                            
-                            <h3>Anggota Kelompok:</h3>
-                            <div class="team-list">
-                                <div class="team-card">
-                                    <span class="num">01</span>
-                                    <div class="member-info">
-                                        <h4>Arfa Bentur Rohman</h4>
-                                        <p>No: 12</p>
-                                    </div>
-                                </div>
-                                <div class="team-card">
-                                    <span class="num">02</span>
-                                    <div class="member-info">
-                                        <h4>Chika Anggraini</h4>
-                                        <p>No: 20</p>
-                                    </div>
-                                </div>
-                                <div class="team-card">
-                                    <span class="num">03</span>
-                                    <div class="member-info">
-                                        <h4>Dika Yoga Pratama</h4>
-                                        <p>No: 26</p>
-                                    </div>
-                                </div>
-                                <div class="team-card">
-                                    <span class="num">04</span>
-                                    <div class="member-info">
-                                        <h4>Faida Trisma Amelia</h4>
-                                        <p>No: 30</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </main>
+    <!-- LIGHTBOX MODAL FOR FOTO ZOOM -->
+    <div class="lightbox-modal" id="lightbox">
+        <span class="lightbox-close" id="lightbox-close">&times;</span>
+        <img class="lightbox-content" id="lightbox-img" src="" alt="Zoomed Image">
     </div>
 
-    <!-- MODAL FOTO GALERI -->
-    <div class="modal" id="image-modal">
-        <span class="close-modal">&times;</span>
-        <img class="modal-content-img" id="modal-img">
-    </div>
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // ===================================================
+        // 1. DYNAMIC HEADER ACCORDING TO CURRENT SECTION
+        // ===================================================
+        const header = document.getElementById('main-header');
+        const headerStatus = document.getElementById('header-status');
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('.nav-link');
 
-    <script src="js/script.js"></script>
+        window.addEventListener('scroll', () => {
+            let currentSection = '';
+
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 150;
+                const sectionHeight = section.clientHeight;
+                if (pageYOffset >= sectionTop && pageYOffset < sectionTop + sectionHeight) {
+                    currentSection = section.getAttribute('id');
+                }
+            });
+
+            // Update Navigation active class
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').includes(currentSection)) {
+                    link.classList.add('active');
+                }
+            });
+
+            // Ubah tampilan Header sesuai Seksi
+            header.classList.remove('theme-about', 'theme-projects');
+            if (currentSection === 'about') {
+                header.classList.add('theme-about');
+                headerStatus.textContent = 'About Me';
+            } else if (currentSection === 'projects') {
+                header.classList.add('theme-projects');
+                headerStatus.textContent = 'Projects';
+            } else {
+                headerStatus.textContent = 'Home';
+            }
+        });
+
+        // ===================================================
+        // 2. FOTO KLIK ZOOM (LIGHTBOX WITH ZOOM ANIMATION)
+        // ===================================================
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        const lightboxClose = document.getElementById('lightbox-close');
+        const galleryItems = document.querySelectorAll('.gallery-item img');
+
+        galleryItems.forEach(img => {
+            img.addEventListener('click', () => {
+                lightboxImg.src = img.src;
+                lightbox.classList.add('active');
+            });
+        });
+
+        // Tutup Lightbox saat tombol X di-klik
+        lightboxClose.addEventListener('click', closeLightbox);
+
+        // Tutup Lightbox saat area luar gambar di-klik
+        lightbox.addEventListener('click', (e) => {
+            if (e.target !== lightboxImg) {
+                closeLightbox();
+            }
+        });
+
+        function closeLightbox() {
+            lightbox.classList.remove('active');
+        }
+
+        // ===================================================
+        // 3. SCROLL REVEAL ANIMATION
+        // ===================================================
+        const revealElements = document.querySelectorAll('.reveal');
+
+        function revealOnScroll() {
+            const windowHeight = window.innerHeight;
+            revealElements.forEach(el => {
+                const elementTop = el.getBoundingClientRect().top;
+                const elementVisible = 100;
+                
+                if (elementTop < windowHeight - elementVisible) {
+                    el.classList.add('active');
+                }
+            });
+        }
+
+        window.addEventListener('scroll', revealOnScroll);
+        // Trigger sekali saat pertama kali muat halaman
+        revealOnScroll();
+    </script>
 </body>
 </html>
