@@ -1,251 +1,779 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
+
     lucide.createIcons();
 
-    // MAP JUDUL DAN DESKRIPSI DINAMIS SETIAP HALAMAN
+    const DATA_URL = "data_sensor.json";
+
+    let previousPinFailed = null;
+    let previousMotionState = null;
+    let previousDoorState = null;
+    let refreshTimer = null;
+
+
+    /* =========================
+       PAGE HEADER
+    ========================= */
+
     const pageHeaders = {
-        'dashboard': {
-            title: 'Real-time Security Dashboard',
-            desc: 'BRANKAS PINTAR — Ringkasan Utama Keamanan & Sistem IoT'
+
+        dashboard: {
+            title: "Real-time Security Dashboard",
+            desc: "BRANKAS PINTAR — Ringkasan Utama Keamanan & Sistem IoT"
         },
-        'sensor': {
-            title: 'Monitoring Telemetri Sensor',
-            desc: 'Data Real-time Keypad 4x4, MPU6050, Sensor Pintu, & Kamera'
+
+        sensor: {
+            title: "Monitoring Telemetri Sensor",
+            desc: "Data Real-time Keypad, MPU6050, Sensor Pintu & ESP32-CAM"
         },
-        'keamanan': {
-            title: 'Galeri Tangkapan Akses Ilegal',
-            desc: 'Dokumentasi Foto Penyusup & Log Deteksi Pemicu Keamanan'
+
+        keamanan: {
+            title: "Security Camera & Detection",
+            desc: "Dokumentasi akses ilegal dan kejadian keamanan"
         },
-        'output': {
-            title: 'Status Aktuator & Indikator Output',
-            desc: 'Monitoring Solenoid Lock, Alarm Audio Buzzer, & LED Status'
+
+        output: {
+            title: "Status Aktuator & Output",
+            desc: "Monitoring Solenoid Lock, Buzzer dan LED Indicator"
         },
-        'about': {
-            title: 'Informasi Project & Profil Tim',
-            desc: 'Teknik Elektronika Industri — SMKN 1 NGLEGOK'
+
+        about: {
+            title: "Informasi Project & Profil Tim",
+            desc: "Teknik Elektronika Industri — SMKN 1 NGLEGOK"
         }
+
     };
 
-    // TAB NAVIGATION SYSTEM WITH DYNAMIC HEADER
-    const navItems = document.querySelectorAll('.nav-item');
-    const tabContents = document.querySelectorAll('.tab-content');
-    const pageTitleElem = document.getElementById('page-title');
-    const pageDescElem = document.getElementById('page-desc');
+
+    /* =========================
+       TAB NAVIGATION
+    ========================= */
+
+    const navItems = document.querySelectorAll(".nav-item");
+    const tabs = document.querySelectorAll(".tab-content");
+
+    const pageTitle = document.getElementById("page-title");
+    const pageDesc = document.getElementById("page-desc");
 
     navItems.forEach(item => {
-        item.addEventListener('click', () => {
-            const tabId = item.getAttribute('data-tab');
 
-            navItems.forEach(nav => nav.classList.remove('active'));
-            tabContents.forEach(tab => tab.classList.remove('active'));
-            
-            item.classList.add('active');
-            const targetTab = document.getElementById(`tab-${tabId}`);
-            if (targetTab) targetTab.classList.add('active');
+        item.addEventListener("click", () => {
 
-            if (pageHeaders[tabId]) {
-                if (pageTitleElem) pageTitleElem.textContent = pageHeaders[tabId].title;
-                if (pageDescElem) pageDescElem.textContent = pageHeaders[tabId].desc;
+            const tabName = item.dataset.tab;
+
+            navItems.forEach(nav => {
+                nav.classList.remove("active");
+            });
+
+            tabs.forEach(tab => {
+                tab.classList.remove("active");
+            });
+
+            item.classList.add("active");
+
+            const target = document.getElementById(`tab-${tabName}`);
+
+            if (target) {
+                target.classList.add("active");
             }
+
+            if (pageHeaders[tabName]) {
+
+                pageTitle.textContent =
+                    pageHeaders[tabName].title;
+
+                pageDesc.textContent =
+                    pageHeaders[tabName].desc;
+
+            }
+
         });
+
     });
 
-    // REAL-TIME CLOCK
+
+    /* =========================
+       CLOCK
+    ========================= */
+
     function updateClock() {
+
         const now = new Date();
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        const seconds = String(now.getSeconds()).padStart(2, '0');
-        const clockElem = document.getElementById('live-clock');
-        if (clockElem) clockElem.textContent = `${hours}:${minutes}:${seconds} WIB`;
+
+        const h = String(now.getHours()).padStart(2, "0");
+        const m = String(now.getMinutes()).padStart(2, "0");
+        const s = String(now.getSeconds()).padStart(2, "0");
+
+        const clock = document.getElementById("live-clock");
+
+        if (clock) {
+            clock.textContent = `${h}:${m}:${s} WIB`;
+        }
+
     }
-    setInterval(updateClock, 1000);
+
     updateClock();
 
-    // COUNTER ANIMATION
-    function animateCounter(element, start, end, duration) {
-        if (!element) return;
-        let startTimestamp = null;
-        const step = (timestamp) => {
-            if (!startTimestamp) startTimestamp = timestamp;
-            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-            element.textContent = Math.floor(progress * (end - start) + start);
-            if (progress < 1) window.requestAnimationFrame(step);
-        };
-        window.requestAnimationFrame(step);
+    setInterval(updateClock, 1000);
+
+
+    /* =========================
+       TOAST
+    ========================= */
+
+    function showToast(title, message) {
+
+        const toast = document.getElementById("toast");
+        const titleElement = document.getElementById("toast-title");
+        const messageElement = document.getElementById("toast-message");
+
+        if (!toast) return;
+
+        titleElement.textContent = title;
+        messageElement.textContent = message;
+
+        toast.classList.add("show");
+
+        setTimeout(() => {
+            toast.classList.remove("show");
+        }, 2500);
+
     }
 
-    // IMAGE MODAL
-    const modal = document.getElementById('image-modal');
-    const modalImg = document.getElementById('modal-img');
-    const closeModal = document.querySelector('.close-modal');
 
-    document.querySelectorAll('.gallery-img').forEach(img => {
-        img.addEventListener('click', () => {
-            if (modal && modalImg) {
-                modal.style.display = "flex";
-                modalImg.src = img.src;
-            }
-        });
-    });
+    /* =========================
+       LOG SYSTEM
+    ========================= */
 
-    if (closeModal) {
-        closeModal.addEventListener('click', () => {
-            modal.style.display = "none";
-        });
-    }
+    function addLog(type, message) {
 
-    // LIVE LOG FEED
-    function addLogEntry(type, message) {
-        const feedList = document.getElementById('live-feed-list');
-        if (!feedList) return;
+        const list =
+            document.getElementById("live-feed-list");
+
+        if (!list) return;
 
         const now = new Date();
-        const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
 
-        const li = document.createElement('li');
-        let badgeClass = 'info';
-        if (type === 'DANGER') badgeClass = 'danger';
-        if (type === 'SUCCESS') badgeClass = 'success';
+        const time =
+            `${String(now.getHours()).padStart(2, "0")}:` +
+            `${String(now.getMinutes()).padStart(2, "0")}:` +
+            `${String(now.getSeconds()).padStart(2, "0")}`;
+
+        let badgeClass = "info";
+
+        if (type === "DANGER") {
+            badgeClass = "danger";
+        }
+
+        if (type === "SUCCESS") {
+            badgeClass = "success";
+        }
+
+        const li = document.createElement("li");
 
         li.innerHTML = `
-            <span class="badge ${badgeClass}">${type}</span>
-            <span class="log-text">${message}</span>
-            <span class="log-time">${timeStr}</span>
+            <span class="badge ${badgeClass}">
+                ${type}
+            </span>
+
+            <span class="log-text">
+                ${message}
+            </span>
+
+            <span class="log-time">
+                ${time}
+            </span>
         `;
 
-        feedList.insertBefore(li, feedList.firstChild);
+        list.insertBefore(li, list.firstChild);
 
-        if (feedList.children.length > 10) {
-            feedList.removeChild(feedList.lastChild);
+        while (list.children.length > 10) {
+            list.removeChild(list.lastChild);
         }
+
     }
 
-    // AUTO-FETCH SENSOR DATA
-    let previousPinFailed = -1;
-    let previousMotionState = false;
-    let previousDoorState = false;
 
-    async function fetchSensorData() {
+    /* =========================
+       COUNTER
+    ========================= */
+
+    function animateCounter(element, start, end) {
+
+        if (!element) return;
+
+        const duration = 500;
+        const startTime = performance.now();
+
+        function animate(currentTime) {
+
+            const progress =
+                Math.min((currentTime - startTime) / duration, 1);
+
+            const value =
+                Math.floor(start + (end - start) * progress);
+
+            element.textContent = value;
+
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            }
+
+        }
+
+        requestAnimationFrame(animate);
+
+    }
+
+
+    /* =========================
+       SAFE STATUS
+    ========================= */
+
+    function updateHeroStatus(data) {
+
+        const hero =
+            document.getElementById("hero-status");
+
+        if (!hero) return;
+
+        const danger =
+            Number(data.pin_failed) >= 3 ||
+            Boolean(data.motion_detected);
+
+        if (danger) {
+
+            hero.textContent =
+                "DETEKSI ANCAMAN ILLEGAL!";
+
+            hero.className =
+                "badge-status-danger";
+
+        } else {
+
+            hero.textContent =
+                "TERPROTEKSI AMAN";
+
+            hero.className =
+                "badge-status-safe";
+
+        }
+
+    }
+
+
+    /* =========================
+       SENSOR UPDATE
+    ========================= */
+
+    function updateSensor(data) {
+
+        /* SOLENOID */
+
+        const solenoidOpen =
+            Boolean(data.solenoid_open);
+
+        const lockText =
+            solenoidOpen ? "TERBUKA" : "TERKUNCI";
+
+        const dashLock =
+            document.getElementById("dash-lock-status");
+
+        const solenoidStatus =
+            document.getElementById("solenoid-status");
+
+        const actuatorSolenoid =
+            document.getElementById("actuator-solenoid-text");
+
+        if (dashLock) {
+            dashLock.textContent = lockText;
+        }
+
+        if (solenoidStatus) {
+
+            solenoidStatus.textContent = lockText;
+
+            solenoidStatus.className =
+                solenoidOpen
+                    ? "val highlight-green"
+                    : "val highlight-red";
+
+        }
+
+        if (actuatorSolenoid) {
+
+            actuatorSolenoid.textContent =
+                solenoidOpen
+                    ? "Solenoid Terbuka"
+                    : "Solenoid Terkunci";
+
+        }
+
+
+        /* DOOR */
+
+        const doorOpen =
+            Boolean(data.door_open);
+
+        const doorText =
+            doorOpen ? "TERBUKA" : "TERTUTUP";
+
+        const dashDoor =
+            document.getElementById("dash-door-status");
+
+        const doorStatus =
+            document.getElementById("door-switch-status");
+
+        if (dashDoor) {
+            dashDoor.textContent = doorText;
+        }
+
+        if (doorStatus) {
+
+            doorStatus.textContent = doorText;
+
+            doorStatus.className =
+                doorOpen
+                    ? "val highlight-red"
+                    : "val highlight-cyan";
+
+        }
+
+        if (
+            previousDoorState !== null &&
+            previousDoorState !== doorOpen
+        ) {
+
+            addLog(
+                doorOpen ? "DANGER" : "INFO",
+                `Pintu brankas ${doorText.toLowerCase()}.`
+            );
+
+        }
+
+        previousDoorState = doorOpen;
+
+
+        /* PIN */
+
+        const pinFailed =
+            Number(data.pin_failed) || 0;
+
+        const dashPin =
+            document.getElementById("dash-pin-failed");
+
+        const pinCounter =
+            document.getElementById("pin-failed-count");
+
+        if (dashPin) {
+            dashPin.textContent = pinFailed;
+        }
+
+        if (pinCounter) {
+
+            const oldValue =
+                previousPinFailed === null
+                    ? pinFailed
+                    : previousPinFailed;
+
+            animateCounter(
+                pinCounter,
+                oldValue,
+                pinFailed
+            );
+
+        }
+
+        if (
+            previousPinFailed !== null &&
+            pinFailed > previousPinFailed
+        ) {
+
+            addLog(
+                "DANGER",
+                `Percobaan PIN gagal bertambah menjadi ${pinFailed}.`
+            );
+
+        }
+
+        if (
+            pinFailed >= 3 &&
+            previousPinFailed !== 3
+        ) {
+
+            addLog(
+                "DANGER",
+                "PIN salah 3x! ESP32-CAM siap mengambil foto."
+            );
+
+            showToast(
+                "SECURITY ALERT",
+                "Percobaan PIN mencapai batas keamanan."
+            );
+
+        }
+
+        previousPinFailed = pinFailed;
+
+
+        /* MPU6050 */
+
+        const x =
+            Number(data.accel_x) || 0;
+
+        const y =
+            Number(data.accel_y) || 0;
+
+        const z =
+            Number(data.accel_z) || 0;
+
+        document.getElementById("acc-x-val").textContent =
+            x.toFixed(2);
+
+        document.getElementById("acc-y-val").textContent =
+            y.toFixed(2);
+
+        document.getElementById("acc-z-val").textContent =
+            z.toFixed(2);
+
+        document.getElementById("bar-x").style.width =
+            `${Math.min(Math.abs(x) * 50, 100)}%`;
+
+        document.getElementById("bar-y").style.width =
+            `${Math.min(Math.abs(y) * 50, 100)}%`;
+
+        document.getElementById("bar-z").style.width =
+            `${Math.min(Math.abs(z) * 50, 100)}%`;
+
+
+        const motion =
+            Boolean(data.motion_detected);
+
+        const dashMpu =
+            document.getElementById("dash-mpu-status");
+
+        const mpuState =
+            document.getElementById("mpu-state");
+
+        if (dashMpu) {
+
+            dashMpu.textContent =
+                motion ? "WARNING" : "STABIL";
+
+        }
+
+        if (mpuState) {
+
+            mpuState.textContent =
+                motion
+                    ? "PERPINDAHAN TERDETEKSI"
+                    : "STABIL / AMAN";
+
+            mpuState.className =
+                motion
+                    ? "val highlight-red"
+                    : "val highlight-green";
+
+        }
+
+        if (
+            motion &&
+            previousMotionState === false
+        ) {
+
+            addLog(
+                "DANGER",
+                "MPU6050 mendeteksi guncangan/perpindahan brankas!"
+            );
+
+            showToast(
+                "MOTION ALERT",
+                "Perpindahan brankas terdeteksi."
+            );
+
+        }
+
+        previousMotionState = motion;
+
+
+        /* CAMERA */
+
+        const camState =
+            document.getElementById("cam-ready-state");
+
+        const camLast =
+            document.getElementById("cam-last-time");
+
+        const imageTime =
+            document.getElementById("img-time-1");
+
+        const cameraImage =
+            document.getElementById("latest-cam-img");
+
+        if (camState) {
+            camState.textContent =
+                data.cam_status || "READY";
+        }
+
+        if (camLast) {
+            camLast.textContent =
+                data.last_capture_time ||
+                "Belum Ada Tangkapan";
+        }
+
+        if (imageTime) {
+            imageTime.textContent =
+                data.last_capture_time ||
+                "--:-- WIB";
+        }
+
+        if (
+            cameraImage &&
+            data.image_url
+        ) {
+
+            cameraImage.src =
+                data.image_url;
+
+        }
+
+
+        /* BUZZER */
+
+        const buzzer =
+            Boolean(data.buzzer_active);
+
+        const buzzerState =
+            document.getElementById("buzzer-state");
+
+        const actuatorBuzzer =
+            document.getElementById("actuator-buzzer-text");
+
+        if (buzzerState) {
+
+            buzzerState.textContent =
+                buzzer
+                    ? "ALARM AKTIF"
+                    : "SILENT";
+
+            buzzerState.className =
+                buzzer
+                    ? "val highlight-red"
+                    : "val highlight-green";
+
+        }
+
+        if (actuatorBuzzer) {
+
+            actuatorBuzzer.textContent =
+                buzzer
+                    ? "Buzzer Berbunyi"
+                    : "Buzzer Non-Aktif";
+
+        }
+
+
+        /* LED */
+
+        const redLed =
+            Boolean(data.led_red_active);
+
+        const led =
+            document.getElementById("led-indicator-state");
+
+        const actuatorLed =
+            document.getElementById("actuator-led-text");
+
+        if (led) {
+
+            led.textContent =
+                redLed
+                    ? "MERAH (WARNING)"
+                    : "HIJAU (NORMAL)";
+
+            led.className =
+                redLed
+                    ? "val highlight-red"
+                    : "val highlight-green";
+
+        }
+
+        if (actuatorLed) {
+
+            actuatorLed.textContent =
+                redLed
+                    ? "LED Merah Menyala"
+                    : "LED Hijau Menyala";
+
+        }
+
+    }
+
+
+    /* =========================
+       FETCH DATA
+    ========================= */
+
+    async function fetchSensorData(showMessage = false) {
+
+        const refreshButton =
+            document.getElementById("refresh-btn");
+
         try {
-            const response = await fetch('data_sensor.json');
-            if (!response.ok) throw new Error('Network error');
-            const data = await response.json();
 
-            // Status Hero
-            const heroStatus = document.getElementById('hero-status');
-            const isAlert = data.pin_failed >= 3 || data.motion_detected;
-            if (heroStatus) {
-                heroStatus.textContent = isAlert ? 'DETEKSI ANCAMAN ILLEGAL!' : 'TERPROTEKSI AMAN';
-                heroStatus.className = isAlert ? 'badge-status-danger' : 'badge-status-safe';
+            if (refreshButton) {
+                refreshButton.classList.add("loading");
             }
 
-            // Solenoid
-            const lockStatusElem = document.getElementById('dash-lock-status');
-            const solenoidStatusElem = document.getElementById('solenoid-status');
-            const actuatorSolenoidText = document.getElementById('actuator-solenoid-text');
-            const solenoidText = data.solenoid_open ? 'TERBUKA' : 'TERKUNCI';
+            const response =
+                await fetch(
+                    `${DATA_URL}?t=${Date.now()}`,
+                    {
+                        cache: "no-store"
+                    }
+                );
 
-            if (lockStatusElem) lockStatusElem.textContent = solenoidText;
-            if (solenoidStatusElem) {
-                solenoidStatusElem.textContent = solenoidText;
-                solenoidStatusElem.className = data.solenoid_open ? 'val highlight-green' : 'val highlight-red';
-            }
-            if (actuatorSolenoidText) {
-                actuatorSolenoidText.textContent = data.solenoid_open ? 'Solenoid Terbuka (Akses Diterima)' : 'Solenoid Terkunci';
+            if (!response.ok) {
+                throw new Error("Data tidak tersedia");
             }
 
-            // Sensor Pintu
-            const dashDoor = document.getElementById('dash-door-status');
-            const doorSwitch = document.getElementById('door-switch-status');
-            const doorText = data.door_open ? 'TERBUKA' : 'TERTUTUP';
-            
-            if (dashDoor) dashDoor.textContent = doorText;
-            if (doorSwitch) {
-                doorSwitch.textContent = doorText;
-                doorSwitch.className = data.door_open ? 'val highlight-red' : 'val highlight-cyan';
+            const data =
+                await response.json();
+
+            updateHeroStatus(data);
+            updateSensor(data);
+
+            const update =
+                document.getElementById("last-update");
+
+            if (update) {
+
+                const now = new Date();
+
+                update.textContent =
+                    `Update ${String(now.getHours()).padStart(2,"0")}:` +
+                    `${String(now.getMinutes()).padStart(2,"0")}:` +
+                    `${String(now.getSeconds()).padStart(2,"0")}`;
+
             }
 
-            if (previousDoorState !== data.door_open && previousDoorState !== false) {
-                addLogEntry(data.door_open ? 'DANGER' : 'INFO', `Pintu brankas terdeteksi ${doorText.toLowerCase()}.`);
-            }
-            previousDoorState = data.door_open;
+            if (showMessage) {
 
-            // PIN Failed Counter
-            if (data.pin_failed !== previousPinFailed) {
-                const dashPin = document.getElementById('dash-pin-failed');
-                const pinFailedElem = document.getElementById('pin-failed-count');
-                if (dashPin) dashPin.textContent = data.pin_failed;
-                if (pinFailedElem) {
-                    animateCounter(pinFailedElem, previousPinFailed < 0 ? 0 : previousPinFailed, data.pin_failed, 800);
-                }
-                if (data.pin_failed === 3 && previousPinFailed !== 3) {
-                    addLogEntry('DANGER', 'Akses Ilegal: PIN Salah 3x! ESP32-CAM mengambil foto.');
-                }
-                previousPinFailed = data.pin_failed;
-            }
+                showToast(
+                    "DATA UPDATED",
+                    "Data sensor berhasil diperbarui."
+                );
 
-            // MPU6050
-            const accXVal = document.getElementById('acc-x-val');
-            const accYVal = document.getElementById('acc-y-val');
-            const accZVal = document.getElementById('acc-z-val');
-            if (accXVal) accXVal.textContent = Number(data.accel_x).toFixed(2);
-            if (accYVal) accYVal.textContent = Number(data.accel_y).toFixed(2);
-            if (accZVal) accZVal.textContent = Number(data.accel_z).toFixed(2);
-
-            const barX = document.getElementById('bar-x');
-            const barY = document.getElementById('bar-y');
-            const barZ = document.getElementById('bar-z');
-            if (barX) barX.style.width = `${Math.min(Math.abs(data.accel_x) * 50, 100)}%`;
-            if (barY) barY.style.width = `${Math.min(Math.abs(data.accel_y) * 50, 100)}%`;
-            if (barZ) barZ.style.width = `${Math.min(Math.abs(data.accel_z) * 50, 100)}%`;
-
-            const dashMpu = document.getElementById('dash-mpu-status');
-            const mpuState = document.getElementById('mpu-state');
-            const mpuText = data.motion_detected ? 'PERPINDAHAN TERDETEKSI' : 'STABIL / AMAN';
-            if (dashMpu) dashMpu.textContent = data.motion_detected ? 'WARNING' : 'STABIL';
-            if (mpuState) {
-                mpuState.textContent = mpuText;
-                mpuState.className = data.motion_detected ? 'val highlight-red' : 'val highlight-green';
-            }
-
-            if (data.motion_detected && !previousMotionState) {
-                addLogEntry('DANGER', 'Sensor MPU6050 mendeteksi guncangan/perpindahan brankas!');
-            }
-            previousMotionState = data.motion_detected;
-
-            // ESP32-CAM
-            const camReadyState = document.getElementById('cam-ready-state');
-            const camLastTime = document.getElementById('cam-last-time');
-            const imgTime1 = document.getElementById('img-time-1');
-            const latestCamImg = document.getElementById('latest-cam-img');
-
-            if (camReadyState) camReadyState.textContent = data.cam_status || 'READY';
-            if (camLastTime) camLastTime.textContent = data.last_capture_time || 'Belum Ada Tangkapan';
-            if (imgTime1) imgTime1.textContent = data.last_capture_time || '--:-- WIB';
-            if (latestCamImg && data.image_url) latestCamImg.src = data.image_url;
-
-            // Buzzer & LED
-            const buzzerState = document.getElementById('buzzer-state');
-            const ledState = document.getElementById('led-indicator-state');
-            const actuatorBuzzerText = document.getElementById('actuator-buzzer-text');
-            const actuatorLedText = document.getElementById('actuator-led-text');
-
-            if (buzzerState) buzzerState.textContent = data.buzzer_active ? 'ALARM AKTIF (ON)' : 'SILENT';
-            if (actuatorBuzzerText) actuatorBuzzerText.textContent = data.buzzer_active ? 'Buzzer Berbunyi (Alarm)' : 'Buzzer Non-Aktif';
-
-            if (ledState) {
-                ledState.textContent = data.led_red_active ? 'MERAH (WARNING)' : 'HIJAU (STANDBY)';
-                ledState.className = data.led_red_active ? 'val highlight-red' : 'val highlight-green';
-            }
-            if (actuatorLedText) {
-                actuatorLedText.textContent = data.led_red_active ? 'LED Merah Menyala (Peringatan)' : 'LED Hijau Menyala (Normal)';
             }
 
         } catch (error) {
-            console.log('Menunggu file data_sensor.json...');
+
+            console.log(
+                "Menunggu data_sensor.json...",
+                error
+            );
+
+        } finally {
+
+            if (refreshButton) {
+                setTimeout(() => {
+                    refreshButton.classList.remove("loading");
+                }, 300);
+            }
+
         }
+
     }
 
-    setInterval(fetchSensorData, 1500);
+
+    /* =========================
+       MANUAL REFRESH
+    ========================= */
+
+    window.manualRefresh = function () {
+        fetchSensorData(true);
+    };
+
+
+    const refreshButton =
+        document.getElementById("refresh-btn");
+
+    if (refreshButton) {
+
+        refreshButton.addEventListener(
+            "click",
+            () => fetchSensorData(true)
+        );
+
+    }
+
+
+    /* =========================
+       AUTO REFRESH
+    ========================= */
+
     fetchSensorData();
+
+    refreshTimer =
+        setInterval(
+            () => fetchSensorData(false),
+            1500
+        );
+
+
+    /* =========================
+       IMAGE MODAL
+    ========================= */
+
+    const modal =
+        document.getElementById("image-modal");
+
+    const modalImage =
+        document.getElementById("modal-img");
+
+    const closeModal =
+        document.querySelector(".close-modal");
+
+    document.querySelectorAll(".gallery-img")
+        .forEach(image => {
+
+            image.addEventListener("click", () => {
+
+                modalImage.src =
+                    image.src;
+
+                modal.classList.add("show");
+
+            });
+
+        });
+
+
+    function hideModal() {
+
+        modal.classList.remove("show");
+
+    }
+
+    if (closeModal) {
+        closeModal.addEventListener(
+            "click",
+            hideModal
+        );
+    }
+
+    if (modal) {
+
+        modal.addEventListener(
+            "click",
+            event => {
+
+                if (event.target === modal) {
+                    hideModal();
+                }
+
+            }
+        );
+
+    }
+
 });
