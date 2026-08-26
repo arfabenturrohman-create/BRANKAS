@@ -1,14 +1,14 @@
 {
-  "solenoid_open": false,
-  "door_open": false,
-  "pin_failed": 0,
-  "motion_detected": false,
-  "accel_x": 0.02,
-  "accel_y": -0.01,
-  "accel_z": 0.99,
-  "cam_status": "READY",
-  "last_capture_time": "17:19:00 WIB",
-  "image_url": "https://via.placeholder.com/400x250/1e293b/38bdf8?text=ESP32-CAM+Capture",
-  "buzzer_active": false,
-  "led_red_active": false
+    "solenoid_open": false,
+    "door_open": false,
+    "pin_failed": 0,
+    "motion_detected": false,
+    "accel_x": 0.02,
+    "accel_y": -0.01,
+    "accel_z": 0.99,
+    "cam_status": "READY",
+    "last_capture_time": "17:19:00 WIB",
+    "image_url": "https://via.placeholder.com/800x500/07111f/38bdf8?text=ESP32-CAM+READY",
+    "buzzer_active": false,
+    "led_red_active": false
 }
